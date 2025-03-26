@@ -1,5 +1,7 @@
 import random, time
 import tabulate
+import sys
+sys.setrecursionlimit(100000)
 
 def ssort(L):
     ### selection sort
@@ -10,11 +12,32 @@ def ssort(L):
         print('selecting minimum %s' % L[m])       
         L[0], L[m] = L[m], L[0]
         print('recursively sorting L=%s\n' % L[1:])
-        return [L[0]] + selection_sort(L[1:])
+        return [L[0]] + ssort(L[1:])
         
+def random_piv(a):
+    if len(a) < 2:
+        return 0
+    else:
+        l = len(a)
+        pivot_index = random.randint(0, l-1)
+    return pivot_index
+def fixed_piv(a):
+    return 0
+
 def qsort(a, pivot_fn):
-    ## TO DO
-    pass
+    pivot = pivot_fn(a)
+    if len(a) <=1:
+        return a
+    right_array = []
+    left_array = []
+    for i in a:
+        if i<a[pivot]:
+            left_array.append(i)
+        if i>a[pivot]:
+            right_array.append(i)
+
+    return qsort(left_array,pivot_fn) + [a[pivot]] +qsort(right_array, pivot_fn)
+
     
 def time_search(sort_fn, mylist):
     """
@@ -39,7 +62,7 @@ def time_search(sort_fn, mylist):
     return (time.time() - start) * 1000
     ###
 
-def compare_sort(sizes=[100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000]):
+def compare_sort(sizes=[1,10,100, 200, 500, 1000, 1100, 2000, 5000, 10000]):
     """
     Compare the running time of different sorting algorithms.
 
@@ -50,19 +73,20 @@ def compare_sort(sizes=[100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 10
       for each method to run on each value of n
     """
     ### TODO - sorting algorithms for comparison
-    qsort_fixed_pivot = # 
-    qsort_random_pivot = #
-    tim_sort = #
+    qsort_fixed_pivot = lambda a: qsort(a, fixed_piv)
+    qsort_random_pivot = lambda a: qsort(a, random_piv)
+    tim_sort = sorted
     result = []
     for size in sizes:
         # create list in ascending order
         mylist = list(range(size))
         # shuffles list if needed
-        #random.shuffle(mylist)
+        random.shuffle(mylist)
         result.append([
             len(mylist),
             time_search(qsort_fixed_pivot, mylist),
             time_search(qsort_random_pivot, mylist),
+            time_search(tim_sort,mylist)
         ])
     return result
     ###
